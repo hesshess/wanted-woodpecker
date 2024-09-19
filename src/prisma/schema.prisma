@@ -1,0 +1,62 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+// User 모델
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  password  String?
+  books     Book[]
+  notes     Note[]
+  sharedBooks SharedBook[] // SharedBook과의 관계
+}
+
+// Book 모델
+model Book {
+  id        String   @id @default(cuid())
+  title     String
+  author    String
+  publishedDate String?
+  likes     Int      @default(0)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  notes     Note[]
+  sharedBooks SharedBook[] // SharedBook과의 관계
+}
+
+// Note 모델
+model Note {
+  id        String   @id @default(cuid())
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  userId    String
+  bookId    String
+  user      User     @relation(fields: [userId], references: [id])
+  book      Book     @relation(fields: [bookId], references: [id])
+  isDeleted  Boolean  @default(false) // Soft delete를 위한 필드
+}
+
+// SharedBook 모델 (공유된 책 정보)
+model SharedBook {
+  id          String   @id @default(cuid())
+  bookId      String
+  userId      String
+  expiresAt   DateTime
+  book        Book     @relation(fields: [bookId], references: [id])
+  user        User     @relation(fields: [userId], references: [id])
+}
