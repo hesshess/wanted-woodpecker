@@ -1,22 +1,16 @@
-import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { Module } from '@nestjs/common';
+import { PrismaService } from './prisma/prisma.service';
 import { ConfigModule } from '@nestjs/config';
-import { AuthModule } from './feature/rest/oauth/auth.module';
-import { GraphQLModule } from '@nestjs/graphql';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
-      isGlobal:true,
-      envFilePath:process.env.NODE_ENV === 'dev' ? '.env.dev' : '.env.test',
+      isGlobal: true,
     }),
     AuthModule,
-    GraphQLModule.forRoot<ApolloDriverConfig>({
-      driver: ApolloDriver,
-      typePaths: ['./**/*.graphql'],
-    })
   ],
   controllers: [],
-  providers: [],
+  providers: [PrismaService],
 })
 export class AppModule {}

@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -13,50 +7,72 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
-// User 모델
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  name      String?
-  password  String?
-  books     Book[]
+  id           Int      @id @default(autoincrement())
+  createdAt    DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt    DateTime @updatedAt @db.Timestamptz(6)
+  provider     String
+  providerId   String
+  refreshToken String?
+  username     String?
+
   notes     Note[]
-  sharedBooks SharedBook[] // SharedBook과의 관계
+  userBooks UserBook[]
+  bookLike  BookLike[]
+
+  @@unique([provider, providerId]) // 복합 고유 키 설정
 }
 
-// Book 모델
+model UserBook {
+  id     Int @id @default(autoincrement())
+  userId Int
+  bookId Int
+
+  book Book @relation(fields: [bookId], references: [id])
+  user User @relation(fields: [userId], references: [id])
+
+  @@unique([userId, bookId])
+}
+
+model BookLike {
+  id     Int     @id @default(autoincrement())
+  bookId Int
+  userId Int
+  isLike Boolean @default(false)
+
+  book Book @relation(fields: [bookId], references: [id])
+  user User @relation(fields: [userId], references: [id])
+
+  @@unique([userId, bookId])
+}
+
 model Book {
-  id        String   @id @default(cuid())
-  title     String
-  author    String
-  publishedDate String?
-  likes     Int      @default(0)
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
-  notes     Note[]
-  sharedBooks SharedBook[] // SharedBook과의 관계
+  id           Int      @id @default(autoincrement())
+  isbn         String   @unique
+  title        String
+  summary      String?
+  shared       Boolean? @default(false)
+  author       String
+  thumbnailUrl String?
+  publisher    String
+  createdAt    DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt    DateTime @updatedAt @db.Timestamptz(6)
+  like         Boolean?
+
+  notes    Note[]
+  userBook UserBook[]
+  bookLike BookLike[]
 }
 
-// Note 모델
 model Note {
-  id        String   @id @default(cuid())
+  id        Int      @id @default(autoincrement())
   content   String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  userId    String
-  bookId    String
-  user      User     @relation(fields: [userId], references: [id])
-  book      Book     @relation(fields: [bookId], references: [id])
-  isDeleted  Boolean  @default(false) // Soft delete를 위한 필드
-}
+  userId    Int
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
+  bookId    Int
+  isDeleted Boolean  @default(false)
 
-// SharedBook 모델 (공유된 책 정보)
-model SharedBook {
-  id          String   @id @default(cuid())
-  bookId      String
-  userId      String
-  expiresAt   DateTime
-  book        Book     @relation(fields: [bookId], references: [id])
-  user        User     @relation(fields: [userId], references: [id])
+  book Book @relation(fields: [bookId], references: [id])
+  user User @relation(fields: [userId], references: [id])
 }
