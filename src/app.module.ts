@@ -6,6 +6,7 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { join } from 'path';
 import { BookModule } from './book/book.module';
+import { NoteModule } from './note/note.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { BookModule } from './book/book.module';
     }),
     AuthModule,
     BookModule,
+    NoteModule,
   ],
   controllers: [],
   providers: [],
