@@ -1,40 +1,61 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
+import { PrismaService } from 'src/prisma/prisma.service';
+
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly prisma: PrismaService,    
-    private readonly jwtService: JwtService
+    private readonly prisma: PrismaService,
+    private readonly jwtService: JwtService,
   ) {}
-  
+
+  async findUserById(id: number) {
+    return this.prisma.user.findUnique({ where: { id } });
+  }
+
   // Kakao ID로 사용자 찾기
   async findUserByKakaoId(providerId: string) {
     return this.prisma.user.findUnique({
-        where: {
-            provider_providerId: {
-              provider: 'kakao',
-              providerId: providerId.toString(),
-            },
-          },
+      where: {       
+        provider_providerId: {
+          provider: 'kakao',
+          providerId: providerId.toString(),
+      }, },
     });
   }
+
+  async validateKakaoUser(providerId: string) {
+    let user = await this.findUserByKakaoId(providerId);
+
+    if (!user) {
+      user = await this.registerUser({ provider: 'kakao', providerId });
+    }
+
+    const payload = { userId: user.id, username: user.username };
+    const accessToken = this.jwtService.sign(payload, { expiresIn: '1h' });
+    const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
+
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: { refreshToken },
+    });
+
+    return { user, accessToken, refreshToken };
+  }
+
   // 새로운 사용자 등록
   async registerUser(profileData: {
     provider: 'kakao' | string;
     providerId: string;
-    refreshToken: string;
-    username: string;
   }) {
     return this.prisma.user.create({
       data: {
         provider: profileData.provider,
         providerId: profileData.providerId.toString(),
-        refreshToken: profileData.refreshToken,
-        username: profileData.username, // username 추가
       },
     });
   }
+
   async updateUserRefreshToken(
     userId: number,
     { refreshToken }: { refreshToken: string },
@@ -45,13 +66,10 @@ export class AuthService {
     });
   }
 
-  async validateKakaoUser(providerId: string, refreshToken: string) {
-    // 카카오 사용자 정보를 서버 사용자와 연동
-    const user = await this.findUserByKakaoId(providerId);
-    await this.prisma.user.update({
-      where: { id: user.id },
-      data: { refreshToken },
+  generateAccessToken(payload) {
+    return this.jwtService.sign(payload, {
+      secret: process.env.JWT_SECRET,
+      expiresIn: '1h',
     });
-    return user;
   }
 }
