@@ -3,7 +3,6 @@ import { AuthGuard } from '@nestjs/passport';
 
 @Controller('auth')
 export class AuthController {
-
   @Get('kakao')
   @UseGuards(AuthGuard('kakao'))
   kakaoLogin() {

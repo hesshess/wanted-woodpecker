@@ -9,12 +9,12 @@ import { JwtStrategy } from './jwt.stratedy';
 import { JwtRefreshStrategy } from './jwt-refresh.stratedy';
 @Module({
   imports: [
-    PassportModule.register({ defaultStrategy: 'kakao' }),    
+    PassportModule.register({ defaultStrategy: 'kakao' }),
     JwtModule.register({
-    secret: process.env.JWT_SECRET,
-    signOptions: { expiresIn: '60m' },
-  }),
-],
+      secret: process.env.JWT_SECRET,
+      signOptions: { expiresIn: '60m' },
+    }),
+  ],
   controllers: [AuthController],
   providers: [
     AuthService,

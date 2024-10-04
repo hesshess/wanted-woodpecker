@@ -19,16 +19,15 @@ export class KakaoStrategy extends PassportStrategy(Strategy, 'kakao') {
     done: (error: any, user?: any, info?: any) => void,
   ) {
     try {
-        const { _json } = profile;
-  
-        const user = await this.authService.validateKakaoUser(
-          _json.id.toString(),
-        );
-  
-        done(null, user);
-      } catch (error) {
-        done(error);
-      }
+      const { _json } = profile;
+
+      const user = await this.authService.validateKakaoUser(
+        _json.id.toString(),
+      );
+
+      done(null, user);
+    } catch (error) {
+      done(error);
     }
   }
-  
+}

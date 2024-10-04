@@ -16,11 +16,12 @@ export class AuthService {
   // Kakao ID로 사용자 찾기
   async findUserByKakaoId(providerId: string) {
     return this.prisma.user.findUnique({
-      where: {       
+      where: {
         provider_providerId: {
           provider: 'kakao',
           providerId: providerId.toString(),
-      }, },
+        },
+      },
     });
   }
 
