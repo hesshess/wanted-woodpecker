@@ -76,7 +76,9 @@ describe('AuthController', () => {
       );
 
       // JSON 응답 확인
-      expect(mockResponse.json).toHaveBeenCalledWith({ user: mockRequest.user });
+      expect(mockResponse.json).toHaveBeenCalledWith({
+        user: mockRequest.user,
+      });
     });
   });
 });

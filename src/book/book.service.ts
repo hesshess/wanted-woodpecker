@@ -1,4 +1,9 @@
-import { BadRequestException, ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import axios from 'axios';
 import { CreateBookInput } from './dto/create-book.input';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -117,7 +122,6 @@ export class BookService {
   }
 
   async generateShareToken(userId: number, bookId: number) {
-
     const existedBook = await this.prisma.userBook.findUnique({
       where: {
         userId_bookId: {
