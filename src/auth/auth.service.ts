@@ -1,8 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { JwtService } from '@nestjs/jwt';
 @Injectable()
 export class AuthService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,    
+    private readonly jwtService: JwtService
+  ) {}
+  
   // Kakao ID로 사용자 찾기
   async findUserByKakaoId(providerId: string) {
     return this.prisma.user.findUnique({
@@ -38,5 +43,15 @@ export class AuthService {
       where: { id: userId },
       data: { refreshToken },
     });
+  }
+
+  async validateKakaoUser(providerId: string, refreshToken: string) {
+    // 카카오 사용자 정보를 서버 사용자와 연동
+    const user = await this.findUserByKakaoId(providerId);
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: { refreshToken },
+    });
+    return user;
   }
 }
