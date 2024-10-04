@@ -13,29 +13,27 @@
 
 ## 구현사항
 
-- [ ] 회원 REST
-  - [ ] 카카오 소셜 회원가입
-  - [ ] 카카오 소셜 로그인
-- [ ] Book
-  - [ ] 검색 (Naver 검색 API) REST
-  - [ ] 저장 - 선택한 책을 DB에 저장 GraphQL
-  - [ ] 저장한 책 좋아요 - GraphQL
-  - [ ] 공유 - REST
-    - 로그인하지 않은 사용자가 10분간 책의 정보와 노트를 조회할 수 있음
-- [ ] Note GraphQL
-  - [ ] 작성 - 저장한 책에 대해 여러 개의 노트를 작성할 수 있음
-  - [ ] 조회 - 작성한 본인만 노트를 열람할 수 있음(공유 상태에는 타인도 열람 가능) / 최근 작성한 순으로 정렬
-  - [ ] 삭제 - Soft Delete
-  - [ ] 수정
+- 회원 REST
+  - 카카오 소셜 회원가입/로그인
 
-## 기타
+- Book
+    1. 책 검색 및 저장 기능 
+        - 책 검색은 Naver API를 사용하세요. (REST)
+        - 검색된 책 중 사용자가 선택한 책을 데이터베이스에 저장합니다. (GraphQL)
+    2. 저장한 책에 좋아요를 할 수 있는 기능 (GraphQL)
+    3. 저장한 책 정보를 외부 공유할 수 있는 기능 (REST)
+        - JWT 토큰을 사용합니다.
+        - 공유를 통해 타 사용자/비로그인 사용자는 공유자가 저장한 책 정보 및 해당 책에 공유자가 작성한 노트를 열람할 수 있습니다.
+        - 열람 만료 기한은 공유 시점으로부터 10분 후 입니다.
 
-- [ ] API 테스트 Postman 사용
-- [ ] NestJS의 Guard, Interceptor 클래스 활용
-- [ ] GraphQL Schema First 방식 사용
-- [ ] Jest 테스트 코드 작성
-- [ ] AWS 배포
-  - [ ] 앱 서버: EC2, ElasticBeanstalk, Fargate 등
-  - [ ] DB: RDS free tier 사용
-- [ ] Github Action CI/CD 구성
-- [ ] Dockerize
+- Note
+    - 노트 CRUD (GraphQL)
+        - 사용자는 자신이 저장한 책에 여러 개의 노트를 작성할 수 있으며, 노트 작성 및 열람 권한은 책을 저장한 사용자 당사자에게만 있습니다.
+        - 노트 삭제는 Soft Delete로 구현합니다.
+        - 노트는 최근 작성 순으로 정렬합니다.
+- 외부 공유 기능을 통해 접근한 사용자는 공유자가 작성한 노트도 열람할 수 있습니다.
+
+
+
+## 트러블슈팅
+[npm nestjs관련 패키지들에 9.5.x는 존재하지 않음](https://github.com/hesshess/wanted-woodpecker/pull/2)
